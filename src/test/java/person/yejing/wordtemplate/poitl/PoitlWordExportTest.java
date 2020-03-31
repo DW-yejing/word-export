@@ -4,15 +4,25 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.MiniTableRenderData;
 import com.deepoove.poi.data.RowRenderData;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 class PoitlWordExportTest {
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Test
     public void SimpleWordExport() throws Exception{
         Map<String, Object> datas = new HashMap<String, Object>();
@@ -21,13 +31,22 @@ class PoitlWordExportTest {
         MiniTableRenderData miniTableRenderData = new MiniTableRenderData(Arrays.asList(row1, row2), 8.00f);
         datas.put("maplist", miniTableRenderData);
         datas.put("budget", "预算");
-        XWPFTemplate template = XWPFTemplate.compile("F:\\workspace_exercise\\word-template\\src\\test\\resources\\poitl.docx").render(datas);
+        Resource resource = applicationContext.getResource("poitl.docx");
+        String filePath = resource.getFile().getAbsolutePath();
+        XWPFTemplate template = XWPFTemplate.compile(filePath).render(datas);
 
         FileOutputStream out = new FileOutputStream("D:/excel/poitl.docx");
         template.write(out);
         out.flush();
         out.close();
         template.close();
+    }
+
+    @Test
+    public void test() throws Exception{
+        Resource resource = applicationContext.getResource("poitl.docx");
+        String filePath = resource.getFile().getAbsolutePath();
+        System.out.println(filePath);
     }
 
 }
